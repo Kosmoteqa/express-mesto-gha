@@ -1,6 +1,6 @@
-const { errorUser } = require('../middlewares/errorCode.js');
-const { errorId } = require('../middlewares/errorCode.js');
-const { notFoundCode } = require('../middlewares/errorCode.js');
+const { errorUser } = require('../middlewares/errorCode');
+const { errorId } = require('../middlewares/errorCode');
+const { notFoundCode } = require('../middlewares/errorCode');
 const UserSchema = require('../models/user.js');
 
 module.exports.getAllUsers = (req, res) => {
