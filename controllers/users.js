@@ -4,9 +4,7 @@ const { notFoundCode } = require('../middlewares/errorCode');
 const UserSchema = require('../models/user');
 
 module.exports.getAllUsers = (req, res) => {
-  UserSchema.find({}).then((users) => {
-    return res.send(users);
-  })
+  UserSchema.find({}).then((users) => res.send(users))
     .catch(() => {
       res.status(notFoundCode).send({ message: 'Произошла ошибка на сервере' });
     });

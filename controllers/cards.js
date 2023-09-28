@@ -4,9 +4,7 @@ const { notFoundCode } = require('../middlewares/errorCode');
 const CardSchema = require('../models/card');
 
 module.exports.getAllCards = (req, res) => {
-  CardSchema.find({}).populate(['owner', 'likes']).then((cards) => {
-    return res.send(cards);
-  })
+  CardSchema.find({}).populate(['owner', 'likes']).then((cards) => res.send(cards))
     .catch(() => {
       res.status(notFoundCode).send({ message: 'Произошла ошибка на сервере' });
     });
