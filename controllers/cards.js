@@ -1,7 +1,7 @@
 const { errorUser } = require('../middlewares/errorCode');
 const { errorId } = require('../middlewares/errorCode');
 const { notFoundCode } = require('../middlewares/errorCode');
-const CardSchema = require('../models/card.js');
+const CardSchema = require('../models/card');
 
 module.exports.getAllCards = (req, res) => {
   CardSchema.find({}).populate(['owner', 'likes']).then((cards) => res.send(cards))

@@ -1,7 +1,7 @@
 const { errorUser } = require('../middlewares/errorCode');
 const { errorId } = require('../middlewares/errorCode');
 const { notFoundCode } = require('../middlewares/errorCode');
-const UserSchema = require('../models/user.js');
+const UserSchema = require('../models/user');
 
 module.exports.getAllUsers = (req, res) => {
   UserSchema.find({}).then((users) => res.send(users))
