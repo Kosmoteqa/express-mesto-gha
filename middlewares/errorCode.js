@@ -6,4 +6,4 @@ module.exports = {
   notFoundCode,
   errorUser,
   errorId,
-}
+};
