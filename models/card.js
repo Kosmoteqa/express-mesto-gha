@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { URLREGEX } = require('../middlewares/validation');
 
 const cardSchema = new mongoose.Schema({
   name: {
@@ -15,6 +16,10 @@ const cardSchema = new mongoose.Schema({
   link: {
     type: String,
     required: true,
+    validate: {
+      validator: (v) => URLREGEX.test(v),
+      message: 'Не вылидный адрес'
+    },
   },
   likes: [{
     type: mongoose.Schema.Types.ObjectId,

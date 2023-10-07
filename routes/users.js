@@ -1,12 +1,27 @@
 const userRouter = require('express').Router();
+const { celebrate, Joi } = require('celebrate');
 const {
-  getAllUsers, getUserById, createUser, editProfile, editAvatar
+  getAllUsers, getUserById, editProfile, editAvatar, getCurrentUser
 } = require('../controllers/users');
+const { URLREGEX } = require('../middlewares/validation');
 
 userRouter.get('/', getAllUsers);
-userRouter.get('/:userId', getUserById);
-userRouter.post('/', createUser);
-userRouter.patch('/me', editProfile);
-userRouter.patch('/me/avatar', editAvatar);
+userRouter.get('/:userId', celebrate({
+  params: Joi.object().keys({
+    userId: Joi.string().required().length(24).hex()
+  })
+}), getUserById);
+userRouter.patch('/me', celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().required().min(2).max(30),
+    about: Joi.string().required().min(2).max(30)
+  })
+}), editProfile);
+userRouter.patch('/me/avatar', celebrate({
+  body: Joi.object().keys({
+    avatar: Joi.string().required().regex(URLREGEX)
+  })
+}), editAvatar);
+userRouter.get('/me', getCurrentUser);
 
 module.exports = userRouter;
