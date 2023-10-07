@@ -6,6 +6,7 @@ const {
 const { URLREGEX } = require('../middlewares/validation');
 
 userRouter.get('/', getAllUsers);
+userRouter.get('/me', getCurrentUser);
 userRouter.get('/:userId', celebrate({
   params: Joi.object().keys({
     userId: Joi.string().required().length(24).hex()
@@ -22,6 +23,4 @@ userRouter.patch('/me/avatar', celebrate({
     avatar: Joi.string().required().regex(URLREGEX)
   })
 }), editAvatar);
-userRouter.get('/me', getCurrentUser);
-
 module.exports = userRouter;
