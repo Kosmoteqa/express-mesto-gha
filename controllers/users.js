@@ -1,8 +1,10 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { errorUser, errorUnauthorized, errorConflict } = require('../middlewares/errorCode');
-const { errorId } = require('../middlewares/errorCode');
 const UserSchema = require('../models/user');
+const NotFound = require('../errors/notFound');
+const BadReq = require('../errors/badReq');
+const Unauthorized = require('../errors/unauthorized');
+const Conflict = require('../errors/conflict');
 
 module.exports.getAllUsers = (req, res, next) => {
   UserSchema.find({}).then((users) => res.send(users))
@@ -12,7 +14,7 @@ module.exports.getAllUsers = (req, res, next) => {
 module.exports.getUserById = (req, res, next) => {
   UserSchema.findById(req.params.userId).then((user) => {
     if (!user) {
-      throw res.status(errorUser).send({ message: 'Пользователь не найден' });
+      throw new NotFound('Пользователь не найден');
     }
     return res.send(user);
   })
@@ -27,7 +29,7 @@ module.exports.createUser = (req, res, next) => {
     .then((hashPassword) => {
       UserSchema.create({
         name, about, avatar, email, password: hashPassword
-      }).then((user) => res.send({
+      }).then((user) => res.status(201).send({
         email: user.email,
         name: user.name,
         about: user.about,
@@ -35,9 +37,9 @@ module.exports.createUser = (req, res, next) => {
       }))
         .catch((err) => {
           if (err.code === 11000) {
-            next(res.status(errorConflict).send({ message: 'Переданы не валидные данные пользователя' }));
+            next(new Conflict('Переданы не валидные данные пользователя'));
           } else if (err.name === 'ValidationError') {
-            next(res.status(errorId).send({ message: 'Переданы не валидные данные пользователя' }));
+            next(new BadReq('Переданы не валидные данные пользователя'));
           } else {
             next(err);
           }
@@ -51,13 +53,13 @@ module.exports.editProfile = (req, res, next) => {
   UserSchema.findByIdAndUpdate(_id, { name, about }, { new: true, runValidators: true })
     .then((user) => {
       if (!user) {
-        throw res.status(errorUser).send({ message: 'Пользователь не найден' });
+        throw new NotFound('Пользователь не найден');
       }
       return res.send(user);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(res.status(errorId).send({ message: 'Переданы не коррекныые данные' }));
+        next(new BadReq('Переданы не коррекныые данные'));
       } else {
         next(err);
       }
@@ -69,13 +71,13 @@ module.exports.editAvatar = (req, res, next) => {
   const { _id } = req.user;
   UserSchema.findByIdAndUpdate(_id, { avatar }, { new: true, runValidators: true }).then((user) => {
     if (!user) {
-      throw res.status(errorUser).send({ message: 'Пользователь не найден' });
+      throw new NotFound('Пользователь не найден');
     }
     return res.send(user);
   })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(res.status(errorId).send({ message: 'Переданы не коррекныые данные' }));
+        next(new BadReq('Переданы не коррекныые данные'));
       } else {
         next(err);
       }
@@ -87,11 +89,11 @@ module.exports.login = (req, res, next) => {
 
   UserSchema.findOne({ email }).select('+password').then((user) => {
     if (!user) {
-      throw res.status(errorUnauthorized).send({ message: 'Пользователь не найден' });
+      throw new Unauthorized('Пользователь не найден');
     }
     return bcrypt.compare(password, user.password).then((matched) => {
       if (!matched) {
-        return next(res.status(errorUnauthorized).send({ message: 'Пользователь не найден' }));
+        return next(new Unauthorized('Пользователь не найден'));
       }
       const token = jwt.sign({ _id: user._id }, 'secret-key', { expiresIn: '7d' });
       return res.send({ token });
@@ -103,7 +105,7 @@ module.exports.login = (req, res, next) => {
 module.exports.getCurrentUser = (req, res, next) => {
   UserSchema.findById(req.user._id).then((user) => {
     if (!user) {
-      throw res.status(errorUser).send({ message: 'Пользователь не найден' });
+      throw new NotFound('Пользователь не найден');
     }
     return res.send(user);
   })
