@@ -1,4 +1,4 @@
-require ('dotenv').config()
+require('dotenv').config();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const UserSchema = require('../models/user');
@@ -6,7 +6,8 @@ const NotFound = require('../errors/notFound');
 const BadReq = require('../errors/badReq');
 const Unauthorized = require('../errors/unauthorized');
 const Conflict = require('../errors/conflict');
-const {NODE_ENV, JWT_SECRET} = process.env;
+
+const { NODE_ENV, JWT_SECRET } = process.env;
 
 module.exports.getAllUsers = (req, res, next) => {
   UserSchema.find({}).then((users) => res.send(users))
